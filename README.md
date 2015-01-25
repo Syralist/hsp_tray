@@ -1,6 +1,6 @@
-hsp 0.1 - OpenStatus for Hackspaces with SpaceAPI
+hsp_tray 0.1 - OpenStatus for Hackspaces with SpaceAPI
 
- Copyright (C) 2014 Daniel Wendt-Fröhlich
+forked from hsp v0.1, Copyright (C) 2014 Daniel Wendt-Fröhlich
  ( daniel.w-froehlich at aetherfoton.de )
  
  This program is free software: you can redistribute it and/or modify

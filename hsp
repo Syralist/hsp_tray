@@ -71,7 +71,7 @@
 
 
 
-HSP_DEBUG=0
+HSP_DEBUG=1
 
 if [ -f ~/.hsp ]			# Wenn ~/.hsp vorhanden ist...
 then
