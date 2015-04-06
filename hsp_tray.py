@@ -59,7 +59,7 @@ class TaskBarIcon(wx.TaskBarIcon):
 
     def CreatePopupMenu(self):
         menu = wx.Menu()
-        create_menu_item(menu, 'Say Hello', self.on_hello)
+        create_menu_item(menu, 'Change Status', self.on_status)
         menu.AppendSeparator()
         create_menu_item(menu, 'Exit', self.on_exit)
         return menu
@@ -67,7 +67,7 @@ class TaskBarIcon(wx.TaskBarIcon):
     def on_left_down(self, event):
         print 'Tray icon was left-clicked.'
 
-    def on_hello(self, event):
+    def on_status(self, event):
         print 'Hello, world!'
 
     def read_status(self, event):
