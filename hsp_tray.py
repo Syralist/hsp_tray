@@ -52,7 +52,7 @@ class TaskBarIcon(wx.TaskBarIcon):
         global STATUS_MESSAGE
         super(TaskBarIcon, self).__init__()
         self.timer = wx.Timer(self, 100)
-        self.timer.Start(60000)
+        self.timer.Start(300000)
         wx.EVT_TIMER(self, 100, self.read_status)
         self.read_status(0)
         self.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
@@ -66,6 +66,7 @@ class TaskBarIcon(wx.TaskBarIcon):
 
     def on_left_down(self, event):
         print 'Tray icon was left-clicked.'
+        self.read_status(0)
 
     def on_status(self, event):
         print 'Hello, world!'
