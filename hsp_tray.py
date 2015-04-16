@@ -43,6 +43,38 @@ def create_menu_item(menu, label, func):
     menu.AppendItem(item)
     return item
 
+class StatusDialog(wx.Frame):
+    def __init__(self, *args, **kw):
+        global STATUS_OPEN
+        super(StatusDialog, self).__init__(*args, **kw)
+        if STATUS_OPEN:
+            self.opencloselabel = "Close"
+        else:
+            self.opencloselabel = "Open"
+        self.InitUI()
+
+    def InitUI(self):
+        self.panel = self #wx.Panel(self)
+        self.status = wx.TextCtrl(parent=self.panel,style=wx.TE_MULTILINE)
+        self.user = wx.TextCtrl(parent=self.panel)
+        self.pw = wx.TextCtrl(parent=self.panel, style=wx.TE_PASSWORD)
+        self.openclose = wx.Button(parent=self.panel, label=self.opencloselabel)
+        self.change = wx.Button(parent=self.panel, label="Change")
+
+        self.textsizer = wx.BoxSizer(wx.VERTICAL)
+        self.textsizer.Add(self.status, flag=wx.ALL|wx.EXPAND)
+        self.textsizer.Add(self.user, flag=wx.ALL|wx.EXPAND)
+        self.textsizer.Add(self.pw, flag=wx.ALL|wx.EXPAND)
+
+        self.buttonsizer = wx.BoxSizer(wx.HORIZONTAL)
+        self.buttonsizer.Add(self.openclose, flag=wx.ALL|wx.EXPAND)
+        self.buttonsizer.Add(self.change, flag=wx.ALL|wx.EXPAND)
+
+        self.sizer = wx.BoxSizer(wx.VERTICAL)
+        self.sizer.Add(self.textsizer, flag=wx.ALL|wx.EXPAND)
+        self.sizer.Add(self.buttonsizer, flag=wx.ALL|wx.EXPAND)
+
+        self.panel.SetSizer(self.sizer)
 
 class TaskBarIcon(wx.TaskBarIcon):
     def __init__(self):
@@ -56,6 +88,7 @@ class TaskBarIcon(wx.TaskBarIcon):
         wx.EVT_TIMER(self, 100, self.read_status)
         self.read_status(0)
         self.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
+        self.StatDialog = StatusDialog(None)
 
     def CreatePopupMenu(self):
         menu = wx.Menu()
@@ -70,6 +103,8 @@ class TaskBarIcon(wx.TaskBarIcon):
 
     def on_status(self, event):
         print 'Hello, world!'
+        self.StatDialog.Show()
+        # self.StatDialog.Destroy()
 
     def read_status(self, event):
         get_Status()
@@ -81,10 +116,8 @@ class TaskBarIcon(wx.TaskBarIcon):
         print icon
         self.SetIcon(icon, STATUS_MESSAGE)
 
-
     def on_exit(self, event):
         wx.CallAfter(self.Destroy)
-
 
 def main():
 
