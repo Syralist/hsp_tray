@@ -30,12 +30,22 @@ def get_Status():
     icon = urllib.urlopen(response.json()['icon']['closed'])
     ICON_CLOSED = icon.read()
     icon.close()
-    # if response.json()['open']:
-    #     print response.json()['icon']['open']
-    # else:
-    #     print response.json()['icon']['closed']
 
+def set_Status(SetOpen, Message, User, Pw):
+    cmdUrl = "https://testhackerspacehb.appspot.com/v2/cmd/"
+    if SetOpen:
+        cmdUrl += "open"
+    else:
+        cmdUrl += "close"
+    r = requests.post(cmdUrl, data={"name":User, "pass":Pw, "message":Message})
+    print(r.status_code, r.reason)
+    # get_Status()
 
+def change_Status(Message, User, Pw):
+    cmdUrl = "https://testhackerspacehb.appspot.com/v2/cmd/message"
+    r = requests.post(cmdUrl, data={"name":User, "pass":Pw, "message":Message, "format":"de"})
+    print(r.status_code, r.reason)
+    # get_Status()
 
 def create_menu_item(menu, label, func):
     item = wx.MenuItem(menu, -1, label)
@@ -59,7 +69,10 @@ class StatusDialog(wx.Frame):
         self.user = wx.TextCtrl(parent=self.panel)
         self.pw = wx.TextCtrl(parent=self.panel, style=wx.TE_PASSWORD)
         self.openclose = wx.Button(parent=self.panel, label=self.opencloselabel)
+        self.openclose.Bind(wx.EVT_BUTTON, self.clickOpenClose)
         self.change = wx.Button(parent=self.panel, label="Change")
+        self.change.Disable()
+        self.change.Bind(wx.EVT_BUTTON, self.clickChange)
 
         self.textsizer = wx.BoxSizer(wx.VERTICAL)
         self.textsizer.Add(self.status, flag=wx.ALL|wx.EXPAND)
@@ -75,6 +88,12 @@ class StatusDialog(wx.Frame):
         self.sizer.Add(self.buttonsizer, flag=wx.ALL|wx.EXPAND)
 
         self.panel.SetSizer(self.sizer)
+
+    def clickOpenClose(self, event):
+        set_Status(not STATUS_OPEN, self.status.Value, self.user.Value, self.pw.Value)
+
+    def clickChange(self, event):
+        change_Status(self.status.Value, self.user.Value, self.pw.Value)
 
 class TaskBarIcon(wx.TaskBarIcon):
     def __init__(self):
