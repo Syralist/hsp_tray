@@ -6,7 +6,7 @@ from cStringIO import StringIO
 TRAY_TOOLTIP = 'System Tray Demo'
 TRAY_ICON = 'hackerspace_icon.png'
 
-HSHBURL = 'https://testhackerspacehb.appspot.com/v2/status'
+HSHBURL = 'https://hackerspacehb.appspot.com/v2/status'
 
 ICON_OPEN = ''
 ICON_CLOSED = ''
@@ -32,7 +32,7 @@ def get_Status():
     icon.close()
 
 def set_Status(SetOpen, Message, User, Pw):
-    cmdUrl = "https://testhackerspacehb.appspot.com/v2/cmd/"
+    cmdUrl = "https://hackerspacehb.appspot.com/v2/cmd/"
     if SetOpen:
         cmdUrl += "open"
     else:
@@ -42,7 +42,7 @@ def set_Status(SetOpen, Message, User, Pw):
     # get_Status()
 
 def change_Status(Message, User, Pw):
-    cmdUrl = "https://testhackerspacehb.appspot.com/v2/cmd/message"
+    cmdUrl = "https://hackerspacehb.appspot.com/v2/cmd/message"
     r = requests.post(cmdUrl, data={"name":User, "pass":Pw, "message":Message, "format":"de"})
     print(r.status_code, r.reason)
     # get_Status()
