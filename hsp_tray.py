@@ -75,7 +75,7 @@ def change_Status(Message, User, Pw):
 def create_menu_item(menu, label, func):
     item = wx.MenuItem(menu, -1, label)
     menu.Bind(wx.EVT_MENU, func, id=item.GetId())
-    menu.AppendItem(item)
+    menu.Append(item)
     return item
 
 class StatusDialog(wx.Frame):
@@ -88,7 +88,8 @@ class StatusDialog(wx.Frame):
         else:
             self.opencloselabel = "Öffnen"
         self.InitUI()
-        wx.EVT_CLOSE(self, self.onClose)
+        # wx.EVT_CLOSE(self, self.onClose)
+        self.Bind(wx.EVT_CLOSE, self.onClose)
 
     def InitUI(self):
         self.panel = wx.Panel(self)
@@ -145,12 +146,13 @@ class StatusDialog(wx.Frame):
 
 
 class TaskBarIcon(wx.adv.TaskBarIcon):
-    def __init__(self):
+    def __init__(self, frame):
         global ICON_OPEN
         global ICON_CLOSED
         global STATUS_OPEN
         global STATUS_MESSAGE
         super(TaskBarIcon, self).__init__()
+        self.frame = frame
         self.timer = wx.Timer(self, 100)
         self.timer.Start(300000)
         self.Bind(wx.EVT_TIMER, self.read_status, self.timer)
@@ -174,19 +176,12 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 
     def read_status(self, event):
         get_Status()
-        icon = wx.EmptyIcon()
+        icon = wx.Icon()
         status = 'Der Space ist '
         if STATUS_OPEN:
-            # bICON_OPEN = base64.encodestring(ICON_OPEN).decode('ascii')
             icon.CopyFromBitmap(wx.Bitmap.NewFromPNGData(ICON_OPEN,len(ICON_OPEN)))
-            # icon.CopyFromBitmap(wx.BitmapFromImage(wx.ImageFromStream(StringIO(ICON_OPEN).getvalue())))
             status = status + 'geöffnet'
         else:
-            # print(ICON_CLOSED)
-            # print(StringIO(ICON_CLOSED).getvalue())
-            # icon.CopyFromBitmap(wx.BitmapFromImage(wx.ImageFromStream(StringIO(ICON_CLOSED).getvalue())))
-            # bICON_CLOSED = base64.encodestring(ICON_CLOSED).decode('ascii')
-            # print(bICON_CLOSED)
             icon.CopyFromBitmap(wx.Bitmap.NewFromPNGData(ICON_CLOSED,len(ICON_CLOSED)))
             status = status + 'geschlossen'
         status = status + ' seit '
@@ -199,11 +194,21 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
 
     def on_exit(self, event):
         wx.CallAfter(self.Destroy)
+        print("on_exit")
+        self.frame.Close()
+        wx.GetApp().ExitMainLoop()
+
+class App(wx.App):
+    def OnInit(self):
+        frame=wx.Frame(None)
+        self.SetTopWindow(frame)
+        TaskBarIcon(frame)
+        return True
 
 def main():
 
-    app = wx.App()
-    TaskBarIcon()
+    app = App(False)
+    # TaskBarIcon()
     app.MainLoop()
 
 
