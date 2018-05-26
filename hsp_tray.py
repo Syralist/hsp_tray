@@ -2,13 +2,15 @@
 # -*- coding: utf-8 -*-
 
 import wx
-import urllib, json
+import wx.adv
+import urllib.request, json
 import requests
-from cStringIO import StringIO
+from io import StringIO
 import datetime
 import sys
-reload(sys)
-sys.setdefaultencoding("utf-8")
+import base64
+# reload(sys)
+# sys.setdefaultencoding("utf-8")
 
 TRAY_TOOLTIP = 'System Tray Demo'
 TRAY_ICON = 'hackerspace_icon.png'
@@ -33,14 +35,16 @@ def get_Status():
     global LAST_CHANGE_DT
 
     response = requests.get(HSHBURL)
-    print response.json()
+    print(response.json())
 
     STATUS_OPEN = response.json()['open']
     STATUS_MESSAGE = response.json()['status']
-    icon = urllib.urlopen(response.json()['icon']['open'])
+    icon = urllib.request.urlopen(response.json()['icon']['open'])
     ICON_OPEN = icon.read()
+    # print(ICON_OPEN)
+    # print(StringIO(ICON_OPEN).getvalue())
     icon.close()
-    icon = urllib.urlopen(response.json()['icon']['closed'])
+    icon = urllib.request.urlopen(response.json()['icon']['closed'])
     ICON_CLOSED = icon.read()
     icon.close()
     LAST_TIME = response.json()['RESULT']['ST2']
@@ -66,7 +70,7 @@ def change_Status(Message, User, Pw):
     r = requests.post(cmdUrl, data={"name":User, "pass":Pw, "message":Message, "time": LAST_TIME})
     print(r.status_code, r.reason)
     # get_Status()
-    print r.text
+    print(r.text)
 
 def create_menu_item(menu, label, func):
     item = wx.MenuItem(menu, -1, label)
@@ -140,7 +144,7 @@ class StatusDialog(wx.Frame):
         self.Hide()
 
 
-class TaskBarIcon(wx.TaskBarIcon):
+class TaskBarIcon(wx.adv.TaskBarIcon):
     def __init__(self):
         global ICON_OPEN
         global ICON_CLOSED
@@ -149,9 +153,9 @@ class TaskBarIcon(wx.TaskBarIcon):
         super(TaskBarIcon, self).__init__()
         self.timer = wx.Timer(self, 100)
         self.timer.Start(300000)
-        wx.EVT_TIMER(self, 100, self.read_status)
+        self.Bind(wx.EVT_TIMER, self.read_status, self.timer)
         self.read_status(0)
-        self.Bind(wx.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
+        self.Bind(wx.adv.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
         self.StatDialog = StatusDialog(None)
 
     def CreatePopupMenu(self):
@@ -173,16 +177,23 @@ class TaskBarIcon(wx.TaskBarIcon):
         icon = wx.EmptyIcon()
         status = 'Der Space ist '
         if STATUS_OPEN:
-            icon.CopyFromBitmap(wx.BitmapFromImage(wx.ImageFromStream(StringIO(ICON_OPEN))))
-            status += 'geöffnet'
+            # bICON_OPEN = base64.encodestring(ICON_OPEN).decode('ascii')
+            icon.CopyFromBitmap(wx.Bitmap.NewFromPNGData(ICON_OPEN,len(ICON_OPEN)))
+            # icon.CopyFromBitmap(wx.BitmapFromImage(wx.ImageFromStream(StringIO(ICON_OPEN).getvalue())))
+            status = status + 'geöffnet'
         else:
-            icon.CopyFromBitmap(wx.BitmapFromImage(wx.ImageFromStream(StringIO(ICON_CLOSED))))
-            status += 'geschlossen'
-        status += ' seit '
-        status += LAST_CHANGE_DT.strftime('%d.%m.%y %H:%M:%S')
-        status += '.\nAktuelle Nachricht:\n'
+            # print(ICON_CLOSED)
+            # print(StringIO(ICON_CLOSED).getvalue())
+            # icon.CopyFromBitmap(wx.BitmapFromImage(wx.ImageFromStream(StringIO(ICON_CLOSED).getvalue())))
+            # bICON_CLOSED = base64.encodestring(ICON_CLOSED).decode('ascii')
+            # print(bICON_CLOSED)
+            icon.CopyFromBitmap(wx.Bitmap.NewFromPNGData(ICON_CLOSED,len(ICON_CLOSED)))
+            status = status + 'geschlossen'
+        status = status + ' seit '
+        status = status + LAST_CHANGE_DT.strftime('%d.%m.%y %H:%M:%S')
+        status = status + '.\nAktuelle Nachricht:\n'
 
-        status += STATUS_MESSAGE
+        status = status + STATUS_MESSAGE
         
         self.SetIcon(icon, status)
 
@@ -191,7 +202,7 @@ class TaskBarIcon(wx.TaskBarIcon):
 
 def main():
 
-    app = wx.PySimpleApp()
+    app = wx.App()
     TaskBarIcon()
     app.MainLoop()
 
