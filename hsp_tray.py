@@ -93,7 +93,7 @@ class StatusDialog(wx.Frame):
 
     def InitUI(self):
         self.panel = wx.Panel(self)
-        self.status = wx.TextCtrl(parent=self.panel,style=wx.TE_MULTILINE|wx.TAB_TRAVERSAL)
+        self.status = wx.TextCtrl(parent=self.panel,size=(250,300),style=wx.TE_MULTILINE|wx.TAB_TRAVERSAL)
         self.user = wx.TextCtrl(parent=self.panel, style=wx.TAB_TRAVERSAL)
         self.pw = wx.TextCtrl(parent=self.panel, style=wx.TE_PASSWORD|wx.TAB_TRAVERSAL)
         self.openclose = wx.Button(parent=self.panel, label=self.opencloselabel)
@@ -120,7 +120,7 @@ class StatusDialog(wx.Frame):
         self.panel.SetSizer(self.sizer)
         self.topSizer = wx.BoxSizer(wx.VERTICAL)
         self.topSizer.Add(self.panel, 1, wx.EXPAND)
-        self.topSizer.Fit(self)
+        # self.topSizer.Fit(self)
         # self.topSizer.Layout() 
 
         self.SetSizer(self.topSizer)
@@ -158,7 +158,7 @@ class TaskBarIcon(wx.adv.TaskBarIcon):
         self.Bind(wx.EVT_TIMER, self.read_status, self.timer)
         self.read_status(0)
         self.Bind(wx.adv.EVT_TASKBAR_LEFT_DOWN, self.on_left_down)
-        self.StatDialog = StatusDialog(None)
+        self.StatDialog = StatusDialog(None, size=(300,400))
 
     def CreatePopupMenu(self):
         menu = wx.Menu()
